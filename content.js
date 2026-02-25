@@ -8,6 +8,8 @@
 // CONFIGURATION - Easy to extend keyword list
 // ============================================================================
 
+// Phrases that clearly indicate no sponsorship / citizenship restriction.
+// Excluded: "must have work authorization" (appears on almost all jobs, incl. those that sponsor)
 const RESTRICTION_KEYWORDS = [
   'no sponsorship',
   'does not provide sponsorship',
@@ -19,7 +21,6 @@ const RESTRICTION_KEYWORDS = [
   'us citizenship is required',
   'only u.s. citizens are eligible',
   'only us citizens are eligible',
-  'u.s. citizens are eligible',
   'gc holders only',
   'no visa support',
   'not eligible for sponsorship',
@@ -34,29 +35,12 @@ const RESTRICTION_KEYWORDS = [
   'unable to sponsor',
   'sponsorship not provided',
   'no work authorization support',
-  'must have work authorization',
   'no visa sponsorship',
   'citizen or permanent resident only',
   'us permanent resident only',
   'green card holders only',
   'no sponsorship available',
   'sponsorship unavailable',
-];
-
-// Individual words / short phrases - may increase detections but also false positives
-// (e.g. "visa" matches both "no visa" and "visa sponsorship provided")
-const INDIVIDUAL_KEYWORDS = [
-  'visa',
-  'sponsorship',
-  'citizen',
-  'secret clearance',
-  'top secret',
-  'security clearance',
-  'dod clearance',
-  'gc',
-  'green card',
-  'h1b',
-  'h-1b',
 ];
 
 // ============================================================================
@@ -117,8 +101,8 @@ function getPageText() {
 }
 
 /**
- * Scans text for restriction keywords (phrases + individual words).
- * Returns array of matched phrases.
+ * Scans text for restriction keywords (phrases only - no individual words
+ * to avoid false positives like "visa" or "sponsorship" on jobs that DO sponsor).
  */
 function scanForRestrictions(text) {
   if (!text) return [];
@@ -129,20 +113,7 @@ function scanForRestrictions(text) {
     if (lower.includes(keyword)) matches.push(keyword);
   }
 
-  for (const keyword of INDIVIDUAL_KEYWORDS) {
-    const trimmed = keyword.trim();
-    // Match whole-word for short terms; use word boundary where applicable
-    const regex = trimmed.length <= 3
-      ? new RegExp(`\\b${escapeRegex(trimmed)}\\b`, 'i')
-      : new RegExp(escapeRegex(trimmed), 'i');
-    if (regex.test(lower)) matches.push(trimmed);
-  }
-
   return [...new Set(matches)]; // Deduplicate
-}
-
-function escapeRegex(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
