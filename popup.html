@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visa Sponsorship Detector</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      width: 280px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      margin: 0;
+      color: #333;
+    }
+    h1 {
+      font-size: 16px;
+      margin: 0 0 12px 0;
+      font-weight: 600;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .toggle-row:last-of-type { border-bottom: none; }
+    label {
+      cursor: pointer;
+      flex: 1;
+    }
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    .hint {
+      font-size: 11px;
+      color: #666;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Visa Sponsorship Detector</h1>
+
+  <div class="toggle-row">
+    <label for="enabled">Enable detection</label>
+    <input type="checkbox" id="enabled" checked>
+  </div>
+
+  <div class="toggle-row">
+    <label for="highlight">Highlight matched text</label>
+    <input type="checkbox" id="highlight">
+  </div>
+
+  <p class="hint">When restriction keywords are found on job pages, a warning banner will appear in the top-right corner.</p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

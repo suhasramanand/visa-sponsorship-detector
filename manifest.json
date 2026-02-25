@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Visa Sponsorship Detector",
+  "version": "1.0.0",
+  "description": "Detects visa/sponsorship restrictions on job application pages and shows a warning when sponsorship is NOT provided.",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Visa Sponsorship Detector"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
