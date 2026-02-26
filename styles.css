@@ -1,98 +1,147 @@
 /**
  * Visa Sponsorship Detector - Banner & Highlight Styles
- * Non-intrusive, top-right placement, does not break page layout.
+ * Sophisticated, non-intrusive design.
  */
 
-/* Banner container - fixed top-right, above most page content */
+/* Banner container - fixed top-right, refined glass-morphism style */
 #visa-sponsorship-detector-banner.vsd-banner {
   position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 2147483647; /* Max z-index to stay above modals */
-  max-width: 360px;
-  min-width: 280px;
-  background: #fff3cd;
-  border: 1px solid #ffc107;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  top: 20px;
+  right: 20px;
+  z-index: 2147483647;
+  max-width: 380px;
+  min-width: 300px;
+  background: linear-gradient(135deg, rgba(30, 30, 35, 0.97) 0%, rgba(45, 45, 52, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 140, 100, 0.25);
+  border-radius: 14px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.25),
+    0 10px 30px -10px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   font-size: 14px;
-  line-height: 1.4;
-  padding: 12px 40px 12px 14px;
+  line-height: 1.5;
+  padding: 18px 44px 18px 18px;
   opacity: 0;
-  transform: translateX(20px);
+  transform: translateX(24px) scale(0.96);
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Visible state - slide in and show */
 #visa-sponsorship-detector-banner.vsd-banner.vsd-banner-visible {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
   pointer-events: auto;
 }
 
 .vsd-banner-content {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+}
+
+.vsd-banner-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .vsd-banner-icon {
-  font-size: 18px;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, rgba(255, 160, 120, 0.35) 0%, rgba(255, 120, 90, 0.25) 100%);
+  border: 1px solid rgba(255, 160, 120, 0.5);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #ff8c6b;
   line-height: 1;
+}
+
+.vsd-banner-title-group {
+  flex: 1;
+}
+
+.vsd-banner-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 160, 130, 0.9);
+  margin-bottom: 2px;
 }
 
 .vsd-banner-title {
   font-weight: 600;
-  color: #856404;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: -0.01em;
+  line-height: 1.35;
 }
 
 .vsd-banner-list {
-  margin: 4px 0 0 0;
-  padding-left: 18px;
-  color: #664d03;
-  font-size: 12px;
+  margin: 0;
+  padding: 0 0 0 4px;
+  list-style: none;
+  border-left: 2px solid rgba(255, 140, 100, 0.3);
 }
 
 .vsd-banner-list li {
-  margin-bottom: 2px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  padding-left: 10px;
+}
+
+.vsd-banner-list li::before {
+  content: '"';
+  color: rgba(255, 140, 100, 0.5);
+}
+
+.vsd-banner-list li::after {
+  content: '"';
+  color: rgba(255, 140, 100, 0.5);
 }
 
 .vsd-banner-more {
   font-style: italic;
-  color: #856404;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-/* Close button */
+/* Close button - minimal, elegant */
 .vsd-banner-close {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: none;
-  background: transparent;
-  color: #856404;
-  font-size: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .vsd-banner-close:hover {
-  background: rgba(133, 100, 4, 0.15);
-  color: #664d03;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Highlight for matched text (optional) */
 .vsd-highlight {
-  background: rgba(255, 193, 7, 0.4);
-  border-radius: 2px;
+  background: rgba(255, 140, 100, 0.25);
+  border-radius: 3px;
   padding: 0 2px;
 }

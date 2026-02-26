@@ -5,42 +5,45 @@
  */
 
 // ============================================================================
-// CONFIGURATION - Easy to extend keyword list
+// CONFIGURATION - Full phrase matching (no keyword + context)
 // ============================================================================
 
-// Phrases that clearly indicate no sponsorship / citizenship restriction.
-// Excluded: "must have work authorization" (appears on almost all jobs, incl. those that sponsor)
-const RESTRICTION_KEYWORDS = [
-  'no sponsorship',
-  'does not provide sponsorship',
-  'without visa sponsorship',
-  'must be a citizen',
-  'us citizen only',
-  'u.s. citizen only',
-  'u.s. citizenship is required',
-  'us citizenship is required',
-  'only u.s. citizens are eligible',
-  'only us citizens are eligible',
-  'gc holders only',
-  'no visa support',
-  'not eligible for sponsorship',
-  'authorized to work without sponsorship',
-  'we do not sponsor visas',
-  'sponsorship is not available',
-  'no h1b sponsorship',
-  'no h-1b sponsorship',
-  'does not sponsor',
-  'will not sponsor',
-  'cannot sponsor',
-  'unable to sponsor',
-  'sponsorship not provided',
-  'no work authorization support',
-  'no visa sponsorship',
-  'citizen or permanent resident only',
-  'us permanent resident only',
-  'green card holders only',
-  'no sponsorship available',
-  'sponsorship unavailable',
+// All restriction phrases - must match exactly. Excludes negated forms (e.g. "no sponsorship required").
+const RESTRICTION_PATTERNS = [
+  // Sponsorship/visa
+  /\bno\s+(?:visa\s+)?sponsorship\b/i,
+  /\b(?:visa\s+)?sponsorship\s+not\s+(?:available|provided|offered|supported)\b/i,
+  /\b(?:we\s+)?(?:do|does|will)\s+not\s+sponsor\b/i,
+  /\b(?:cannot|unable\s+to)\s+sponsor\b/i,
+  /\b(?:do|does)\s+not\s+provide\s+sponsorship\b/i,
+  /\bnot\s+eligible\s+for\s+sponsorship\b/i,
+  /\bno\s+(?:h-?1b|h1b|visa)\s+sponsor/i,
+  /\b(?:we\s+)?(?:do|does)\s+not\s+sponsor\s+visas\b/i,
+  // Citizenship / permanent resident (full phrases only - avoids "no citizenship required")
+  /\b(?:us|u\.?s\.?)\s+citizenship\s+required\b/i,
+  /\bmust\s+be\s+(?:a\s+)?(?:us|u\.?s\.?)\s+citizen\b/i,
+  /\b(?:us|u\.?s\.?)\s+citizen(?:s)?\s+only\b/i,
+  /\bonly\s+(?:us|u\.?s\.?)\s+citizens?\s+(?:are\s+)?eligible\b/i,
+  /\bgreen\s+card\s+holders?\s+only\b/i,
+  /\b(?:citizen\s+or\s+)?permanent\s+resident\s+only\b/i,
+  /\b(?:us|u\.?s\.?)\s+permanent\s+resident\s+only\b/i,
+  /\bauthorized\s+to\s+work\s+without\s+sponsorship\b/i,
+  /\bproof\s+of\s+(?:country\s+of\s+)?citizenship\b/i,
+  /\bcitizenship\s+verification\b/i,
+  /\bapplicants?\s+must\s+be\s+(?:a\s+)?(?:us|u\.?s\.?)\s+citizen/i,
+  /\binternational\s+traffic\s+in\s+arms\s+regulations\b/i,
+  /\bexport\s+administration\s+regulations\b/i,
+];
+
+// Phrases that mean "they sponsor" - skip match if these appear (avoid false positives)
+const EXCLUSION_PATTERNS = [
+  /\bno\s+[a-z\s]{0,25}(?:citizenship|citizen)\s+required\b/i,
+  /\b(?:citizenship|citizen)\s+not\s+required\b/i,
+  /\b(?:no|not)\s+[a-z\s]{0,30}(?:visa\s+)?sponsorship\s+(?:required|needed)\b/i,
+  /\b(?:visa\s+)?sponsorship\s+not\s+(?:required|needed)\b/i,
+  /\b(?:do|does)\s+not\s+require\s+(?:visa\s+)?sponsorship\b/i,
+  /\bwith\s+or\s+without\s+(?:visa\s+)?sponsorship\b/i,
+  /\b(?:visa\s+)?sponsorship\s+(?:is\s+)?available\b/i,
 ];
 
 // ============================================================================
@@ -101,19 +104,22 @@ function getPageText() {
 }
 
 /**
- * Scans text for restriction keywords (phrases only - no individual words
- * to avoid false positives like "visa" or "sponsorship" on jobs that DO sponsor).
+ * Scans text for restriction phrases. Uses full phrase matching only.
+ * Excludes matches when page contains "they sponsor" phrases.
  */
 function scanForRestrictions(text) {
   if (!text) return [];
-  const lower = text.toLowerCase();
   const matches = [];
 
-  for (const keyword of RESTRICTION_KEYWORDS) {
-    if (lower.includes(keyword)) matches.push(keyword);
+  // If exclusions match, the page says they sponsor - don't flag
+  if (EXCLUSION_PATTERNS.some((p) => p.test(text))) return [];
+
+  for (const pattern of RESTRICTION_PATTERNS) {
+    const m = text.match(pattern);
+    if (m) matches.push(m[0].toLowerCase());
   }
 
-  return [...new Set(matches)]; // Deduplicate
+  return [...new Set(matches)];
 }
 
 /**
@@ -168,15 +174,27 @@ function showBanner(matchedPhrases) {
     const content = document.createElement('div');
     content.className = 'vsd-banner-content';
 
+    const header = document.createElement('div');
+    header.className = 'vsd-banner-header';
+
     const icon = document.createElement('span');
     icon.className = 'vsd-banner-icon';
-    icon.textContent = '⚠️';
-    content.appendChild(icon);
+    icon.textContent = '⚠';
+    header.appendChild(icon);
 
+    const titleGroup = document.createElement('div');
+    titleGroup.className = 'vsd-banner-title-group';
+    const label = document.createElement('div');
+    label.className = 'vsd-banner-label';
+    label.textContent = 'Restriction Detected';
     const mainText = document.createElement('div');
     mainText.className = 'vsd-banner-title';
-    mainText.textContent = 'This job does NOT provide visa sponsorship';
-    content.appendChild(mainText);
+    mainText.textContent = 'This job does not provide visa sponsorship';
+    titleGroup.appendChild(label);
+    titleGroup.appendChild(mainText);
+    header.appendChild(titleGroup);
+
+    content.appendChild(header);
 
     const list = document.createElement('ul');
     list.className = 'vsd-banner-list';
@@ -202,7 +220,7 @@ function showBanner(matchedPhrases) {
     const phrasesToShow = matchedPhrases.slice(0, 5); // Show up to 5
     phrasesToShow.forEach((phrase) => {
       const li = document.createElement('li');
-      li.textContent = `"${phrase}"`;
+      li.textContent = phrase;
       list.appendChild(li);
     });
     if (matchedPhrases.length > 5) {
@@ -233,39 +251,41 @@ const HIGHLIGHT_CLASS = 'vsd-highlight';
 function highlightMatchedText(matches) {
   removeHighlights();
 
-  // Highlight first match only (simpler; avoid DOM complexity from multiple wraps)
   if (matches.length === 0) return;
   const keyword = matches[0];
-  const text = document.body.innerText;
-  if (!text || !text.toLowerCase().includes(keyword)) return;
 
-  const lower = text.toLowerCase();
-  const idx = lower.indexOf(keyword);
-  if (idx === -1) return;
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: (node) => {
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_REJECT;
+      const tagName = parent.tagName?.toLowerCase();
+      if (['script', 'style', 'noscript'].includes(tagName)) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
 
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  let pos = 0;
+  // Search each text node for the keyword (avoids innerText/TreeWalker position mismatch)
   let node;
-
   while ((node = walker.nextNode())) {
-    const len = node.textContent.length;
-    if (pos + len > idx) {
-      const offset = idx - pos;
-      const endOffset = Math.min(offset + keyword.length, node.textContent.length);
-      try {
-        const range = document.createRange();
-        range.setStart(node, offset);
-        range.setEnd(node, endOffset);
-        const span = document.createElement('span');
-        span.className = HIGHLIGHT_CLASS;
-        span.textContent = keyword;
-        range.surroundContents(span);
-      } catch (e) {
-        // surroundContents can fail for split/cross-element text; skip
-      }
-      break;
+    const content = node.textContent;
+    const lower = content.toLowerCase();
+    const idx = lower.indexOf(keyword);
+    if (idx === -1) continue;
+
+    const endOffset = Math.min(idx + keyword.length, content.length);
+    try {
+      const range = document.createRange();
+      range.setStart(node, idx);
+      range.setEnd(node, endOffset);
+      const span = document.createElement('span');
+      span.className = HIGHLIGHT_CLASS;
+      span.textContent = content.slice(idx, endOffset);
+      range.surroundContents(span);
+      span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (e) {
+      // surroundContents fails if range crosses element boundaries
     }
-    pos += len;
+    break; // Highlight first occurrence only
   }
 }
 
